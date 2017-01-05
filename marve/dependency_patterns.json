@@ -1,0 +1,194 @@
+{
+    "dep": {
+         "conj": {
+            "enhanced": true,
+            "and": {
+                "measurement_types": ["space_between", "attached"],
+                "pos_in": {
+                    "NN": null
+                }
+            }   
+        },
+        "nmod": {
+            "enhanced": true,
+            "between": {
+                "measurement_types": ["space_between", "attached"],
+                "pos_in": {
+                    "NN": null,
+                    "VB": {
+                        "get_cousin": ["dobj"]
+                    }
+                }
+            },
+            "for": {
+                "measurement_types": ["space_between", "attached"],
+                "pos_in": {
+                    "NN": null
+                }
+            },
+            "tmod": {
+                "measurement_types": ["space_between", "attached"],
+                "pos_equals": {
+                    "JJ": {
+                        "get_cousin": ["acl"],
+                        "else": true
+                    }
+                }
+            },
+            "at": {
+                "measurement_types": ["space_between", "attached"],
+                "pos_in": {
+                    "VB": {
+                        "get_cousin": ["dobj","nmod:for", "nmod:in", "nmod:at", "nmod:between", "nmod:to", "nmod:of", "nmod:within", "acl", "dep", "nmod:about", "nmod:about", "nsubjpass", "xcomp", "nsubj"],
+                        "else": false
+                    }
+                }
+            },
+            "to": {
+                "measurement_types": ["space_between", "attached"],
+                "pos_in": {
+                    "VB": {
+                        "get_cousin": ["dobj","nmod:for", "nmod:in", "nmod:at", "nmod:between", "nmod:to", "nmod:of", "nmod:within", "acl", "dep", "nmod:about", "nmod:about", "nsubjpass", "xcomp", "nsubj"],
+                        "else": false
+                    }
+                }
+            },
+            "in":{
+                "measurement_types": ["space_between", "attached"],
+                "pos_in":{
+                    "VB": {
+                        "get_cousin": ["dobj","nmod:for", "nmod:in", "nmod:at", "nmod:between", "nmod:to", "nmod:of", "nmod:within", "acl", "dep", "nmod:about", "nmod:about", "nsubjpass", "xcomp", "nsubj"],
+                        "else": false
+                    },
+                    "NN": null
+                } 
+            },
+            "of":{
+                "measurement_types": ["space_between", "attached"],
+                "pos_in":{
+                    "NN": null
+                }
+            },
+            "within":{
+                "measurement_types": ["space_between", "attached"],
+                "pos_in":{
+                    "NN": {
+                        "else": true
+                    }
+                }
+            },
+            "with":{
+                "measurement_types": ["space_between", "attached"],
+                "pos_in":{
+                    "NN": {
+                        "else": true
+                    }
+                }
+            },
+            "about":{
+                "measurement_types": ["space_between", "attached"],
+                "pos_in":{
+                    "NN": null
+                }
+            },
+            "by":{
+                "measurement_types": ["space_between", "attached"],
+                "pos_in":{
+                    "NN": null
+                }
+            },
+            "after":{
+                "measurement_types": ["space_between", "attached"],
+                "pos_in":{
+                    "NN": null
+                }
+            },
+            "npmod":{
+                "measurement_types": ["space_between", "attached"],
+                "pos_in":{
+                    "NN": null, 
+                    "RB": {
+                        "get_cousin": ["advmod", "nmod:in"],
+                        "else": "always"
+                    }
+                }
+            }
+        },
+        "amod":{
+            "enhanced": false,
+            "measurement_types": ["space_between", "attached", "hyphenated"],
+            "pos_in":{
+                "NN": null
+            }
+        },
+        "nummod":{
+            "measurement_types": ["space_between", "attached"],
+            "enhanced": false,
+            "pos_in":{
+                "": {
+                    "get_cousin": ["amod", "nmod"],
+                    "add_sibling": true,
+                    "else": true
+                }
+            }
+        },
+        "dep":{
+            "measurement_types": ["space_between", "attached", "uncertain"],
+            "enhanced": false,
+            "pos_in":{
+                    "NN": null,
+                    "VB":{
+                        "get_cousin": ["acl", "nsubj"],
+                        "else": true
+                    }
+            }
+        },
+        "dobj":{
+            "measurement_types": ["space_between", "attached"],
+            "enhanced": false,
+            "pos_in":{
+                "VB":{
+                    "get_cousin": ["acl", "nsubj"],
+                    "else": true
+                }
+            }
+        },
+        "compound": {
+            "measurement_types": ["space_between", "attached", "hyphenated"],
+            "enhanced": false,
+            "pos_in":{
+                "NN": {
+                    "special": "SPECIAL CASE",
+                    "else": false
+                }
+            }
+        },
+        "nsubj":{
+            "measurement_types": ["space_between", "attached"],
+            "enhanced": false,
+            "pos_in":{
+                "NN": null,
+                "VB": {
+                    "get_cousin": ["dobj", "acl:relcl"]
+                }
+            }
+        },
+        "appos":{
+            "measurement_types": ["space_between", "attached", "hyphenated"],
+            "enhanced": false,
+            "pos_in": {
+                "NN": null
+            }
+        },
+        "advmod":{
+            "measurement_types": ["space_between", "attached", "hyphenated"],
+            "enhanced": false,
+            "pos_in": {
+                "RB": null
+            }
+        }
+    },
+    "word":{
+        "or": ["=","<",">","~"]
+    } 
+}

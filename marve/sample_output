@@ -1,0 +1,55 @@
+{
+    "type": "value", 
+    "quantity": {
+        "parsedValue": 28, 
+        "rawValue": "28", 
+        "rawUnit": {
+            "rawName": "weeks", 
+            "connector": "returned", 
+            "name": "weeks", 
+            "offsetEnd": 42, 
+            "tokenIndices": [
+                "8"
+            ], 
+            "after": " ", 
+            "offsetStart": 37, 
+            "tokenIndex": 8, 
+            "descriptors": [], 
+            "relationForm": "nmod:at"
+        }, 
+        "offsetEnd": 36, 
+        "offsetStart": 34, 
+        "tokenIndex": 7, 
+        "type": "time"
+    }, 
+    "quantified": {
+        "rawName": "gestation", 
+        "connector": "", 
+        "normalizedName": "gestation", 
+        "offsetEnd": 55, 
+        "relationForm": "nmod:of", 
+        "offsetStart": 46, 
+        "tokenIndex": 10, 
+        "descriptors": []
+    }, 
+    "related": [
+        {
+            "rawName": "Europe", 
+            "connector": "returned", 
+            "offsetEnd": 30, 
+            "relationForm": "nmod:at", 
+            "offsetStart": 24, 
+            "tokenIndex": 5, 
+            "descriptors": []
+        }, 
+        {
+            "rawName": "patient", 
+            "connector": "returned", 
+            "offsetEnd": 11, 
+            "relationForm": "nmod:at", 
+            "offsetStart": 4, 
+            "tokenIndex": 2, 
+            "descriptors": []
+        }
+    ]
+}

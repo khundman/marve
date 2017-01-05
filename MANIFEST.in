@@ -1,0 +1,4 @@
+include marve/dependency_patterns.json
+include LICENSE
+include README.md
+include requirements.txt
