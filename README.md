@@ -37,7 +37,7 @@ Install grobid by following instructions [here](http://grobid.readthedocs.io/en/
 Then follow [grobid-quantities instructions](https://github.com/kermitt2/grobid-quantities) to install, build, train, and run
 
 Install Marve:</br>
-`pip install marve`
+clone this repo or `pip install marve`
 
 ## Usage
 Once both CoreNLP and grobid-quantities are running, Marve can be used as such:
@@ -69,7 +69,7 @@ Marve will only return words related to measurements if they meet criteria laid 
 
 Take the phrase `"a spatial resolution of 10m"`. Marve uses a graph to represent each sentence, where edges are the dependencies between words (represented in green ovals below) and nodes are words and their part-of-speech (POS) labels (represented in blue). 
 
-![example](https://github.jpl.nasa.gov/hundman/marve/blob/master/blob/example.png)
+![example](https://github.com/khundman/marve/blob/master/blob/example.png)
 
 There are a handful of general patterns that relate measurement units, values, and other related words or entities in a sentence. For instance, units are generally connected to values via the numerical modifier (`"nummod"`) dependency (see above). Nominal modifiers (`"nmod"`) is then a common dependency linking units to the thing being quantified. Common patterns linking values, units, and related words have been defined in `/marve/dependency_patterns.json`, and the bit of JSON that would match `"m"` to `"resolution"` in our above example is:
 
