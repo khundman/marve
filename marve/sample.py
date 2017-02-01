@@ -15,7 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from marve import Measurements as m
+# from marve import Measurements as m
+import Measurements as m
+import json
 
 test = "The patient returned to Europe at 28 weeks of gestation."
 
@@ -25,5 +27,4 @@ patterns = "dependency_patterns.json" #default installed with Marve
 write_to = "sample_output"
 
 # Pass strings (paragraph at most)
-m.extract(test, coreNLP, grobid, patterns, write_to, show_graph=False, pretty=True, simplify=False)
-
+out = m.extract(test, coreNLP, grobid, patterns, write_to, show_graph=False, pretty=True, simplify=True)

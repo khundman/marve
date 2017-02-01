@@ -55,7 +55,7 @@ def grobid_quantities(sentence, a, endpoint):
     except ValueError as e:
         print ('No Grobid response for: %s' %(sentence))
         logging.warning('No Grobid response for: %s' %(sentence))
-        return quantities
+        return ""
 
     #Add token index for num, unit, quantified if available
     if isinstance(quantities, dict):

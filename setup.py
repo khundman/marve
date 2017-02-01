@@ -21,7 +21,7 @@ with open('LICENSE') as f:
 
 setup(
 	name='marve',
-	version='0.0.6',
+	version='0.0.7',
 	description='Package for extracting measurements and related entities from text.',
 	platforms=["any"],
 	author='Kyle Hundman',
@@ -29,5 +29,6 @@ setup(
 	url='https://github.com/khundman/marve',
 	license=license,
 	packages=['marve'],
-	install_requires=[i.strip() for i in open("requirements.txt").readlines()]
+	install_requires=[i.strip() for i in open("requirements.txt").readlines()],
+	include_package_data=True
 )

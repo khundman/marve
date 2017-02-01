@@ -320,7 +320,9 @@ def _get_related(stats, match, patterns_file):
         all_related = _parse_patterns(match["unit_idx"], ["uncertain"], patterns_file)
 
     # get words like approximately
-    adverbs = _parse_patterns([match["num_idx"]], match["measurement_format"], patterns_file)
+    num_adverbs = _parse_patterns([match["num_idx"]], match["measurement_format"], patterns_file)
+    unit_adverbs = _parse_patterns([match["unit_idx"]], match["measurement_format"], patterns_file)
+    adverbs = num_adverbs + unit_adverbs
     for_removal = [] 
     for a in adverbs:
         if a["relationForm"] != "advmod":

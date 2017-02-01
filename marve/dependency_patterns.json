@@ -103,6 +103,18 @@
                     "NN": null
                 }
             },
+            "over":{
+                "measurement_types": ["space_between", "attached"],
+                "pos_in":{
+                    "NN": null
+                }
+            },
+            "along":{
+                "measurement_types": ["space_between", "attached"],
+                "pos_in":{
+                    "NN": null
+                }
+            },
             "npmod":{
                 "measurement_types": ["space_between", "attached"],
                 "pos_in":{
@@ -150,7 +162,8 @@
                 "VB":{
                     "get_cousin": ["acl", "nsubj"],
                     "else": true
-                }
+                },
+                "NN": null
             }
         },
         "compound": {

@@ -29,9 +29,10 @@ class Stats:
         self.total_measurements = 0       
 
     def print_summary(self):
+        pass
         # All results (make function)
-        print ("Total Sentences Parsed: " + str(self.total_sentences))
-        print ("Total Measurements Parsed: " + str(self.total_measurements))
+        # print ("Total Sentences Parsed: " + str(self.total_sentences))
+        # print ("Total Measurements Parsed: " + str(self.total_measurements))
         # print ("Total Measurement Types Found: " )
         # for key, value in stats.pattern_cnts["type"].iteritems():
         #     print "   " + key + ": " + str(value)
