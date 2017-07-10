@@ -182,6 +182,20 @@ Returns:		dict: see "Output Options" below
 }
 ```
 
+# Citation:
+
+If you use this work, please cite:
+
+```
+@inproceedings{hundmanmarve17,
+  title={Measurement Context Extraction from Text: Discovering Opportunities and Gaps in Earth Science},
+  author={Hundman, Kyle and Mattmann, Chris A},
+  booktitle={Proceedings of the 23rd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining},
+  year={2017},
+  organization={ACM}
+}
+```
+
 ## License
 Marve is distributed under [Apache 2.0 license](http://www.apache.org/licenses/LICENSE-2.0).
 
