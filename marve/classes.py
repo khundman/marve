@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import json
 
 class Stats:
     """ Holds statistics on measurement extraction processing
@@ -61,7 +60,7 @@ class Annotations:
         self.tok_start = {}
         self.tok_end = {}
         self.index_lookup = {}
-        self.lookup[0] = {"pos" : "", "word": ""} #0 not included in tokens, but included in dependencies
+        self.lookup[0] = {"pos": "", "word": ""} #0 not included in tokens, but included in dependencies
         
         for f in self.tokens:
             self.tok_start[f["characterOffsetBegin"] - self.tokens[0]["characterOffsetBegin"]] = f["index"]
@@ -78,7 +77,6 @@ class Annotations:
             self.lookup[f["index"]]["after"] = f["after"]
 
             self.index_lookup[f["word"]] = f["index"]
-
 
     def augment_match(self, grobid):
         """ 
@@ -120,18 +118,19 @@ class Annotations:
             else:
                 return
 
-        if key == "quantity": num = grobid[key]["rawValue"] 
-        if key == "quantityMost" and "quantityLeast" in grobid: num = grobid["quantityLeast"]["rawValue"] + " to " +  grobid[key]["rawValue"]
+        if key == "quantity":
+            num = grobid[key]["rawValue"]
+        if key == "quantityMost" and "quantityLeast" in grobid:
+            num = grobid["quantityLeast"]["rawValue"] + " to " + grobid[key]["rawValue"]
 
         self.matches.append({
-            "measurement_format" : format, 
-            "unit_idx" : unit_idx, 
-            "unit" : unit, 
-            "num_idx" : str(grobid[key]["tokenIndex"]), 
-            "num" : num,
-            "grobid" : grobid
+            "measurement_format": format,
+            "unit_idx": unit_idx,
+            "unit": unit,
+            "num_idx": str(grobid[key]["tokenIndex"]),
+            "num": num,
+            "grobid": grobid
         })
-    
 
     def check_output(self, sentence, stats):
         """ 

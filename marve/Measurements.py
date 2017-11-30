@@ -30,20 +30,21 @@ import logging
 from classes import Stats, Annotations
 from grobid import grobid_quantities
 
-
 ##################################################################################
 # Globals
 ##################################################################################
 basedir = os.path.abspath(os.path.dirname(__file__))
 stats = Stats()
-A = None # global annotations object
-Num = None # global sentence object
-G = None # global dependency tree object
+A = None  # global annotations object
+Num = None  # global sentence object
+G = None  # global dependency tree object
 
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(levelname)-8s %(message)s',
                     datefmt='%a, %d %b %Y %H:%M:%S',
                     filename=os.path.join(basedir, 'measurement.log'))
+
+
 ##################################################################################
 
 
@@ -69,17 +70,16 @@ def _build_graph(show=False):
         for x in types:
             G.add_node(str(dep[x]), word=dep[x + "Gloss"], pos=A.lookup[dep[x]]["pos"])
             node_labels[str(dep[x])] = dep[x + "Gloss"] + " : " + A.lookup[dep[x]]["pos"]
-        
+
         # edges, labels
         G.add_edge(str(dep[types[0]]), str(dep[types[1]]), dep=dep["dep"])
         edge_labels[(str(dep[types[0]]), str(dep[types[1]]))] = dep["dep"]
-       
+
     if show == True:
         pos = nx.spring_layout(G)
-        nx.draw_networkx(G,pos=pos, labels=node_labels, node_color="white", alpha=.5)
-        nx.draw_networkx_edge_labels(G,pos=pos,edge_labels=edge_labels)
+        nx.draw_networkx(G, pos=pos, labels=node_labels, node_color="white", alpha=.5)
+        nx.draw_networkx_edge_labels(G, pos=pos, edge_labels=edge_labels)
         plt.show()
-
 
 
 #########################################
@@ -91,21 +91,20 @@ def _get_connected(edge, idx):
 
     Args:
         edge (tuple): Contains token indices of two connect words and the dependency type between them - e.g. ('11', '14', {'dep': 'nmod:at'})
-        idx (int): Token index of word 
+        idx (int): Token index of word
 
     Returns:
-        str or None: str if connected word is found in provided edge, None if not 
+        str or None: str if connected word is found in provided edge, None if not
     """
     if str(edge[0]) == str(idx) and A.lookup[int(edge[1])]["word"] != Num:
-        return edge[1] 
+        return edge[1]
     elif str(edge[1]) == str(idx) and A.lookup[int(edge[0])]["word"] != Num:
         return edge[0]
 
 
-
 def _get_cousin(sibling_idx, dep_type_list, visited_nodes={}):
-    """Find a second degree relation within the dependency graph. 
-    Used to find subject in a sentence when the measurement unit is a direct object, for example. 
+    """Find a second degree relation within the dependency graph.
+    Used to find subject in a sentence when the measurement unit is a direct object, for example.
 
     Args:
         sibling_idx (str): Token index of the sibling node through which to find the cousin
@@ -114,23 +113,24 @@ def _get_cousin(sibling_idx, dep_type_list, visited_nodes={}):
     Returns:
         list: cousin words meeting POS and dependency criteria
     """
-    words = [] #Visited nodes prevent recursion from bouncing between two "VB" nodes
-
+    words = []  # Visited nodes prevent recursion from bouncing between two "VB" nodes
 
     for dep_type in dep_type_list:
         for edge in G.edges(data=True):
-            
+
             cousin_idx = _get_connected(edge, sibling_idx)
 
             allowed_pos = ["NN", "PR"]
-            if cousin_idx and dep_type in edge[2]['dep'] and any(x in A.lookup[int(cousin_idx)]['pos'] for x in allowed_pos):
+            if cousin_idx and dep_type in edge[2]['dep'] and any(
+                            x in A.lookup[int(cousin_idx)]['pos'] for x in allowed_pos):
                 words.append(G.node[cousin_idx]['word'])
 
             # Go to second cousin if cousin is a verb
-            elif cousin_idx and dep_type in edge[2]['dep'] and "VB" in A.lookup[int(cousin_idx)]['pos'] and (not cousin_idx in visited_nodes or visited_nodes[cousin_idx] < 2):
+            elif cousin_idx and dep_type in edge[2]['dep'] and "VB" in A.lookup[int(cousin_idx)]['pos'] and (
+                not cousin_idx in visited_nodes or visited_nodes[cousin_idx] < 2):
                 words.extend(_get_cousin(cousin_idx, ["nsubj", "nsubjpass", "acl"], visited_nodes=visited_nodes))
 
-            if cousin_idx: 
+            if cousin_idx:
                 if cousin_idx in visited_nodes:
                     visited_nodes[cousin_idx] += 1
                 else:
@@ -138,9 +138,8 @@ def _get_cousin(sibling_idx, dep_type_list, visited_nodes={}):
     return set(words)
 
 
-
 def _add_related(related, dep, all_related, index, connector=None):
-    """Adds a word (and its metadata) related to a measurement to the list of all related words for that measurement 
+    """Adds a word (and its metadata) related to a measurement to the list of all related words for that measurement
 
     Args:
         related (str): related token/word
@@ -158,11 +157,10 @@ def _add_related(related, dep, all_related, index, connector=None):
     doc["tokenIndex"] = int(index)
     doc["offsetStart"] = A.lookup[int(index)]["start"]
     doc["offsetEnd"] = A.lookup[int(index)]["end"]
-    doc["connector"] = "" if connector == None else connector
+    doc["connector"] = "" if connector is None else connector
     if not doc in all_related:
         all_related.append(doc)
     return all_related
-
 
 
 def _add_descriptors(related):
@@ -184,18 +182,19 @@ def _add_descriptors(related):
                     {
                         "tokenIndex": sibling_idx,
                         "rawName": A.lookup[int(sibling_idx)]["word"]
-                     }
+                    }
                 )
 
             if sibling_idx and "NN" in A.lookup[int(sibling_idx)]["pos"] and "amod" in edge[2]["dep"]:
                 additional_related = _get_cousin(sibling_idx, ["nmod"])
                 for add in set(additional_related):
-                    related = _add_related(add, "nmod", related, A.index_lookup[add], connector=G.node[sibling_idx]['word'])
+                    related = _add_related(add, "nmod", related, A.index_lookup[add],
+                                           connector=G.node[sibling_idx]['word'])
     return related
 
 
 def _check_criteria(dep, dep_obj, all_related, edge, sibling_idx):
-    """ If measurement is found, runs processed sentence through valid dependency patterns 
+    """ If measurement is found, runs processed sentence through valid dependency patterns
         (from JSON file) to find additional words related to measurements
 
     Args:
@@ -210,53 +209,58 @@ def _check_criteria(dep, dep_obj, all_related, edge, sibling_idx):
     """
     # Check for a matching dependency type
     related = []
-    
+
     if edge[2]["dep"] == dep:
         # Check for matching POS type(s)
         for pos_logic in dep_obj.keys():
             connector = None
 
             if isinstance(dep_obj[pos_logic], dict):
-                for pos in dep_obj[pos_logic].keys(): 
+                for pos in dep_obj[pos_logic].keys():
 
                     # Check for allowed part of speech tags in matched dependency patterns
-                    if (pos_logic == "pos_in" and pos in G.node[sibling_idx]["pos"]) or (pos_logic == "pos_equals" and pos == G.node[sibling_idx]["pos"]):
+                    if (pos_logic == "pos_in" and pos in G.node[sibling_idx]["pos"]) or (
+                            pos_logic == "pos_equals" and pos == G.node[sibling_idx]["pos"]):
                         pass
                     elif pos_logic == "pos_not":
-                        if not [False if not_pos == G.node[sibling_idx]["pos"] else True for not_pos in dep_obj.keys()]: continue
+                        if not [False if not_pos == G.node[sibling_idx]["pos"] else True for not_pos in
+                                dep_obj.keys()]: continue
                     else:
                         continue
-                    
+
                     # if no additional checks, have a match
-                    if dep_obj[pos_logic][pos] == None or any(y in dep_obj[pos_logic][pos] for y in [None, "add_sibling"]):
-                        all_related = _add_related(G.node[sibling_idx]['word'], dep, all_related, A.index_lookup[G.node[sibling_idx]['word']])
+                    if dep_obj[pos_logic][pos] == None or any(
+                                    y in dep_obj[pos_logic][pos] for y in [None, "add_sibling"]):
+                        all_related = _add_related(G.node[sibling_idx]['word'], dep, all_related,
+                                                   A.index_lookup[G.node[sibling_idx]['word']])
 
                     # if additional checks are required, process further
                     if dep_obj[pos_logic][pos]:
-                        if "get_cousin" in dep_obj[pos_logic][pos]:      
+                        if "get_cousin" in dep_obj[pos_logic][pos]:
                             related.extend(_get_cousin(sibling_idx, dep_obj[pos_logic][pos]["get_cousin"]))
                             connector = G.node[sibling_idx]['word']
 
                         if "special" in dep_obj[pos_logic][pos]:
-                            if dep == "compound" and pos == "NN":    
+                            if dep == "compound" and pos == "NN":
                                 related = [G.node[sibling_idx]['word']]
 
                         if None in related:
                             related.remove(None)
-                        
+
                         # Allows for getting cousin and returning sibling
                         if "else" in dep_obj[pos_logic][pos].keys() and dep_obj[pos_logic][pos]["else"] == "always":
-                            all_related = _add_related(G.node[sibling_idx]['word'], dep, all_related, A.index_lookup[G.node[sibling_idx]['word']], connector=connector)
+                            all_related = _add_related(G.node[sibling_idx]['word'], dep, all_related,
+                                                       A.index_lookup[G.node[sibling_idx]['word']], connector=connector)
                         if len(related) > 0 and isinstance(related, list):
                             for x in related:
                                 if x != None:
-                                    all_related = _add_related(x, dep, all_related, A.index_lookup[x], connector=connector)
+                                    all_related = _add_related(x, dep, all_related, A.index_lookup[x],
+                                                               connector=connector)
                         elif "else" in dep_obj[pos_logic][pos].keys() and dep_obj[pos_logic][pos]["else"] == True:
-                            all_related = _add_related(G.node[sibling_idx]['word'], dep, all_related, A.index_lookup[G.node[sibling_idx]['word']], connector=connector)
+                            all_related = _add_related(G.node[sibling_idx]['word'], dep, all_related,
+                                                       A.index_lookup[G.node[sibling_idx]['word']], connector=connector)
 
     return all_related
-
-
 
 
 def _parse_patterns(unit_idx, measurement_format, patterns_file):
@@ -268,7 +272,7 @@ def _parse_patterns(unit_idx, measurement_format, patterns_file):
 
     Returns:
         list: related words and metadata
-    """              
+    """
 
     all_related = []
 
@@ -282,24 +286,25 @@ def _parse_patterns(unit_idx, measurement_format, patterns_file):
                     for dep in tree["dep"].keys():
                         if tree["dep"][dep]["enhanced"] == True:
                             for inner_dep in tree["dep"][dep].keys():
-                                if isinstance(tree["dep"][dep][inner_dep], dict) and measurement_format in tree["dep"][dep][inner_dep]["measurement_types"]:
+                                if isinstance(tree["dep"][dep][inner_dep], dict) and measurement_format in \
+                                        tree["dep"][dep][inner_dep]["measurement_types"]:
                                     full_dep = dep + ":" + inner_dep
                                     full_dep_obj = tree["dep"][dep][inner_dep]
-                                    all_related = _check_criteria(full_dep, full_dep_obj, all_related, edge, sibling_idx)
+                                    all_related = _check_criteria(full_dep, full_dep_obj, all_related, edge,
+                                                                  sibling_idx)
 
                         elif measurement_format in tree["dep"][dep]["measurement_types"]:
                             all_related = _check_criteria(dep, tree["dep"][dep], all_related, edge, sibling_idx)
 
                     for x in range(0, len(tree["word"]["or"])):
                         if G.node[sibling_idx]["word"] == tree["word"]["or"][x]:
-                             related = _get_cousin(sibling_idx, ["nsubj"])
-                             for r in related:
+                            related = _get_cousin(sibling_idx, ["nsubj"])
+                            for r in related:
                                 all_related = _add_related(r, "operator", all_related, A.index_lookup[r])
 
     all_related = _add_descriptors(all_related)
 
     return all_related
-
 
 
 def _get_related(stats, match, patterns_file):
@@ -311,7 +316,7 @@ def _get_related(stats, match, patterns_file):
 
     Returns:
         list: related words and metadata
-    """        
+    """
     all_related = None
     measurement_formats = ["space_between", "attached", "hyphenated"]
 
@@ -323,18 +328,18 @@ def _get_related(stats, match, patterns_file):
     num_adverbs = _parse_patterns([match["num_idx"]], match["measurement_format"], patterns_file)
     unit_adverbs = _parse_patterns([match["unit_idx"]], match["measurement_format"], patterns_file)
     adverbs = num_adverbs + unit_adverbs
-    for_removal = [] 
+    for_removal = []
     for a in adverbs:
         if a["relationForm"] != "advmod":
             for_removal.append(a)
         else:
-            [a.pop(key, None) for key in ["descriptors", "connector"]] #not relevant for adverbs
+            [a.pop(key, None) for key in ["descriptors", "connector"]]  # not relevant for adverbs
     [adverbs.remove(a) for a in for_removal]
 
     if adverbs:
         match["grobid"]["adverbs"] = adverbs
 
-    # Check to make sure related isn't already a number, unit, or quantified thing identified by Grobid 
+    # Check to make sure related isn't already a number, unit, or quantified thing identified by Grobid
     potential_keys = ["quantity", "quantityLeast", "quantityMost", "quantified"]
 
     if all_related:
@@ -345,15 +350,16 @@ def _get_related(stats, match, patterns_file):
                     if "rawValue" in match["grobid"][key]: num = match["grobid"][key]["rawValue"]
                     if "rawUnit" in match["grobid"][key]: unit = match["grobid"][key]["rawUnit"]["name"]
                     if "normalizedName" in match["grobid"][key]: quantified = match["grobid"][key]["normalizedName"]
-                    
-                    if related["rawName"] in [num, unit, quantified] or related["rawName"] == num + unit or (quantified in related["rawName"] and not quantified == ""):
+
+                    if related["rawName"] in [num, unit, quantified] or related["rawName"] == num + unit or (
+                            quantified in related["rawName"] and not quantified == ""):
                         all_related.remove(related)
 
                         if related["rawName"] == unit:
                             for k in related.keys():
                                 if not k in match["grobid"][key]["rawUnit"]:
                                     match["grobid"][key]["rawUnit"][k] = related[k]
- 
+
                         elif related["rawName"] == quantified:
                             for k in related.keys():
                                 if not k in match["grobid"][key]:
@@ -374,7 +380,7 @@ def _simplify_results(match):
     keys = []
     simplified = {}
     simplified["value"] = []
-    
+
     if match["type"] == "value":
         keys = ["quantity"]
     elif match["type"] == "interval":
@@ -397,11 +403,11 @@ def _simplify_results(match):
     simplified["quantified"] = {}
     simplified["related"] = {}
 
-    if "quantified" in match: 
+    if "quantified" in match:
 
         if simplified["unit"] == "":
             simplified["unit"] = match["quantified"]["normalizedName"]
-        
+
         simplified["quantified"][match["quantified"]["normalizedName"]] = []
         if "descriptors" in match["quantified"]:
 
@@ -416,13 +422,11 @@ def _simplify_results(match):
 
             if "descriptors" in r:
                 r["descriptors"].sort(key=lambda x: int(x["tokenIndex"]), reverse=False)
-                
+
                 for z in r["descriptors"]:
                     simplified["related"][r["rawName"]].append(z["rawName"])
 
-    
     return simplified
-
 
 
 def _reconstruct_sent(parsed_sentence):
@@ -437,18 +441,29 @@ def _reconstruct_sent(parsed_sentence):
     sent = ""
     for x in range(0, len(parsed_sentence["tokens"])):
         sent += parsed_sentence["tokens"][x]['originalText']
-        if x+1 != len(parsed_sentence["tokens"]):
-            # Use character indices from tokens to ensure correct spacing when reconstructing 
-            num_spaces = parsed_sentence["tokens"][x+1]["characterOffsetBegin"] - parsed_sentence["tokens"][x]["characterOffsetEnd"]
+        if x + 1 != len(parsed_sentence["tokens"]):
+            # Use character indices from tokens to ensure correct spacing when reconstructing
+            num_spaces = parsed_sentence["tokens"][x + 1]["characterOffsetBegin"] - parsed_sentence["tokens"][x][
+                "characterOffsetEnd"]
             for y in range(0, num_spaces):
                 sent += " "
     return sent
 
 
+def _sorted_dictionary(orig_dict, sort_list):
+    od = OrderedDict()
+    for item in sort_list:
+        if item in orig_dict:
+            od[item] = orig_dict[item]
+
+    return od
+
+
 #########################################
 # Top-Level function
 #########################################
-def extract(content, corenlp_endpoint, grobid_endpoint, dependency_patterns_file, output_file=None, show_graph=False, pretty=False, simplify=False):
+def extract(content, corenlp_endpoint, grobid_endpoint, dependency_patterns_file, output_file=None, show_graph=False,
+            pretty=False, simplify=False):
     """ Top-level user interface to parsing measurements and related words
 
     Args:
@@ -464,7 +479,7 @@ def extract(content, corenlp_endpoint, grobid_endpoint, dependency_patterns_file
     Returns:
         List of objects: containing parsed measurement info
         (optionally write to file)
-    """  
+    """
 
     all_extractions = []
 
@@ -472,25 +487,36 @@ def extract(content, corenlp_endpoint, grobid_endpoint, dependency_patterns_file
     if output_file:
         out = codecs.open(output_file, "a", encoding="utf-8")
 
-    if len(content) < 5: return None
+    if len(content) < 5:
+        return None
 
     nlp = StanfordCoreNLP(corenlp_endpoint)
-    output = nlp.annotate(content, properties={'outputFormat':'json', 'timeout':'9999'})
-    if isinstance(output, basestring):
+    output = nlp.annotate(content, properties={'outputFormat': 'json', 'timeout': '9999'})
+
+    if isinstance(output, str):  # str supports both python 2 and 3
         output = json.loads(output.encode("latin-1"), strict=False)
 
-    if "sentences" in output and isinstance(output["sentences"],list):
+    if "sentences" in output and isinstance(output["sentences"], list):
         for i in range(0, len(output["sentences"])):
             s_str = _reconstruct_sent(output["sentences"][i])
-        
-            #Enhanced dependencies have different key names in JSON depending on version of CoreNLP
-            dep_key = "enhanced-plus-plus-dependencies" if not "collapsed-ccprocessed-dependencies" in output["sentences"][i] else "collapsed-ccprocessed-dependencies"
-            
-            global A 
+
+            # Enhanced dependencies have different key names in JSON depending on version of CoreNLP
+            possible_keys = [
+                "enhanced-plus-plus-dependencies-annotation",
+                "enhancedPlusPlusDependencies"
+            ]
+
+            dep_key = "collapsed-ccprocessed-dependencies"  # default key
+            if "collapsed-ccprocessed-dependencies" not in output["sentences"][i]:
+                for k in possible_keys:
+                    if k in output["sentences"][i]:
+                        dep_key = k
+
+            global A
             A = Annotations(output["sentences"][i]["tokens"], output["sentences"][i][dep_key])
 
-            if A.check_output(output["sentences"][i], stats) == True:
-                
+            if A.check_output(output["sentences"][i], stats) is True:
+
                 stats.total_sentences += 1
                 G = _build_graph(show=show_graph)
                 grobid_response = grobid_quantities(s_str, A, grobid_endpoint)
@@ -502,45 +528,50 @@ def extract(content, corenlp_endpoint, grobid_endpoint, dependency_patterns_file
                     stats.total_measurements += len(A.matches)
 
                     for idx, match in enumerate(A.matches):
-                        
+
                         global Num
                         Num = match["num"]
 
-                        match["sentence"] = i+1
+                        match["sentence"] = i + 1
                         match["grobid"]["related"] = _get_related(stats, match, dependency_patterns_file)
 
                         # Remove fields used for processing but not to be shown to user
-                        remove = ["adverbs", "num", "unit", "connector", "form", "sentence", "num_idx", "unit_idx", "measurement_format"]
+                        remove = ["adverbs", "num", "unit", "connector", "form", "sentence", "num_idx", "unit_idx",
+                                  "measurement_format"]
                         [match.pop(x, None) for x in remove]
-                        sort_order = ['adverbs', 'type', 'quantity', 'quantityLeast', 'quantityMost', 'quantified', 'related']
-                        match_ordered = OrderedDict(sorted(match["grobid"].iteritems(), key=lambda (k, v): sort_order.index(k)))
+                        sort_order = ['adverbs', 'type', 'quantity', 'quantityLeast', 'quantityMost', 'quantified',
+                                      'related']
+
+                        match_ordered = _sorted_dictionary(match["grobid"], sort_order)
 
                         if simplify:
-                            simplified_sort_order = ['value', 'unit', 'quantified','related']
+                            simplified_sort_order = ['value', 'unit', 'quantified', 'related']
                             simplified = _simplify_results(match_ordered)
 
                             if simplified:
-                                match_ordered = OrderedDict(sorted(simplified.iteritems(), key=lambda (k, v): simplified_sort_order.index(k)))
+                                match_ordered = _sorted_dictionary(match["grobid"], simplified_sort_order)
 
                         if pretty and not simplify:
-                            if out: out.write(json.dumps(match_ordered, ensure_ascii=False, indent=4))
-                            if idx != len(A.matches) - 1 and out: out.write(",\n")
-                        
+                            if out:
+                                out.write(json.dumps(match_ordered, ensure_ascii=False, indent=4))
+                            if idx != len(A.matches) - 1 and out:
+                                out.write(",\n")
+
                         elif out:
                             out.write(json.dumps(match_ordered, ensure_ascii=False) + "\n")
 
                     all_extractions.extend(A.matches)
 
             else:
-                logging.warning("CoreNLP parsing failed for sentence: %s" %(s_str))                
+                logging.warning("CoreNLP parsing failed for sentence: %s" % (s_str))
     else:
-        logging.warning("CoreNLP parsing failed for content: %s" %(content))
+        logging.warning("CoreNLP parsing failed for content: %s" % (content))
 
-    if out: out.close()
+    if out:
+        out.close()
 
-    logging.info("Total sentences parsed: %s" %(str(stats.total_sentences)))
-    logging.info("Total measurements found: %s" %(str(stats.total_measurements)))
+    logging.info("Total sentences parsed: %s" % (str(stats.total_sentences)))
+    logging.info("Total measurements found: %s" % (str(stats.total_measurements)))
     stats.print_summary()
 
     return all_extractions
-
