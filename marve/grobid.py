@@ -20,6 +20,7 @@ import subprocess
 import logging
 import json
 
+
 def grobid_quantities(sentence, a, endpoint):
     """
     a = annotations
@@ -38,8 +39,8 @@ def grobid_quantities(sentence, a, endpoint):
     sentence = re.sub("\$", "\\$", sentence)
     sentence = re.sub("\"", '\\"', sentence)
     sentence = re.sub("%", '%25', sentence)
-    sentence = re.sub("`","'", sentence)
-    sentence = re.sub("'",'\\"', sentence)
+    sentence = re.sub("`", "'", sentence)
+    sentence = re.sub("'", '\\"', sentence)
 
     if endpoint[len(endpoint)-1:] == "/":
         endpoint = endpoint[:len(endpoint)-1]
@@ -48,13 +49,13 @@ def grobid_quantities(sentence, a, endpoint):
     try:
         response = subprocess.check_output('curl -X POST -d text="' + sentence + '" ' + endpoint + '/processQuantityText', shell=True)
     except:
-        logging.error("Invalid subprocess call for: %s" %(sentence))
+        logging.error("Invalid subprocess call for: %s" % sentence)
     quantities = {}
     try:
         quantities = json.loads(response)
     except ValueError as e:
-        print ('No Grobid response for: %s' %(sentence))
-        logging.warning('No Grobid response for: %s' %(sentence))
+        print('No Grobid response for: %s' % sentence)
+        logging.warning('No Grobid response for: %s' % sentence)
         return ""
 
     #Add token index for num, unit, quantified if available
@@ -77,8 +78,8 @@ def grobid_quantities(sentence, a, endpoint):
                 return {}
 
             if key == "":
-                logging.error('Unknown Grobid key resulting from parse of: %s' %(sentence))
-                print "Unknown Grobid key resulting from parse of: %s" %(sentence)
+                logging.error('Unknown Grobid key resulting from parse of: %s' % sentence)
+                print("Unknown Grobid key resulting from parse of: %s" % sentence)
 
             # Grobid doesn't pick up negatives
             if sentence[sentence.find(q[key]["rawValue"]) - 1] == "-":
@@ -89,8 +90,8 @@ def grobid_quantities(sentence, a, endpoint):
             if q[key]["offsetStart"] in a.tok_start:
                 q[key]["tokenIndex"] = a.tok_start[q[key]["offsetStart"]]
             else:
-                print "Not finding token index for Grobid Quantity value in CoreNLP output. Sentence: %s" %(sentence)
-                logging.error("Not finding token index for Grobid Quantity value in CoreNLP output. Sentence: %s" %(sentence))
+                print("Not finding token index for Grobid Quantity value in CoreNLP output. Sentence: %s" % sentence)
+                logging.error("Not finding token index for Grobid Quantity value in CoreNLP output. Sentence: %s" % sentence)
                 return {}
 
             if "rawUnit" in q[key]:

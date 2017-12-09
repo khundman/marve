@@ -17,18 +17,18 @@
 from setuptools import setup, find_packages
 
 with open('LICENSE') as f:
-	license = f.read()
+    license = f.read()
 
 setup(
-	name='marve',
-	version='0.0.7',
-	description='Package for extracting measurements and related entities from text.',
-	platforms=["any"],
-	author='Kyle Hundman',
-	author_email='khundman@gmail.com',
-	url='https://github.com/khundman/marve',
-	license=license,
-	packages=['marve'],
-	install_requires=[i.strip() for i in open("requirements.txt").readlines()],
-	include_package_data=True
+    name='marve',
+    version='0.0.7',
+    description='Package for extracting measurements and related entities from text.',
+    platforms=["any"],
+    author='Kyle Hundman',
+    author_email='khundman@gmail.com',
+    url='https://github.com/khundman/marve',
+    license=license,
+    packages=['marve'],
+    install_requires=[i.strip() for i in open("requirements.txt").readlines()],
+    include_package_data=True
 )
