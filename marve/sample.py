@@ -22,7 +22,7 @@ import json
 test = "The patient returned to Europe at 28 weeks of gestation."
 
 coreNLP = "http://localhost:9000"
-grobid = "http://localhost:8080"
+grobid = "http://localhost:8060/service"
 patterns = "dependency_patterns.json" #default installed with Marve
 write_to = "sample_output"
 
