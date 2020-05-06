@@ -28,7 +28,7 @@ import json
 from collections import OrderedDict
 import logging
 # custom
-from classes import Stats, Annotations
+from .classes import Stats, Annotations
 from grobid_quantities.quantities import QuantitiesClient
 
 
